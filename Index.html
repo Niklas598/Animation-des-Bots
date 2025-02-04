@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suchbot-Prozess Animation</title>
+    <style>
+        body {
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            color: #222;
+        }
+
+        h1 {
+            color: #111;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #444;
+        }
+
+        /* Suchleiste */
+        .search-bar {
+            margin: 20px auto;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 12px;
+            border: 2px solid #219ebc;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px;
+            background-color: #219ebc;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* Hauptcontainer */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;  /* Mehr Abstand */
+            justify-content: center;
+            align-items: center;
+            margin: 40px auto;
+            max-width: 1000px;
+        }
+
+        .step {
+            width: 250px;
+            height: 180px;
+            background-color: #8ecae6;
+            border: 3px solid #219ebc;
+            border-radius: 10px;
+            position: relative;
+            transition: background-color 0.5s, transform 0.5s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        .database { background-color: #f4a261; border-color: #e76f51; }
+        .ranking { background-color: #ffb703; border-color: #fb8500; }
+        .results { background-color: #90be6d; border-color: #43aa8b; }
+
+        .active {
+            background-color: #48cae4 !important;
+            transform: scale(1.05);
+        }
+
+        .bot {
+            width: 50px;
+            height: 50px;
+            background-color: #ffb703;
+            border-radius: 50%;
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 24px;
+            transition: top 1.5s, left 1.5s;
+            animation: bounce 1s infinite;
+            z-index: 10;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, 0); }
+            50% { transform: translate(-50%, -10px); }
+        }
+
+        .label {
+            margin-top: 10px;
+            color: #111;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .description {
+            margin-top: 8px;
+            font-size: 15px;
+            color: #222;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #bbb;
+        }
+
+        /* Fortschrittsbalken */
+        .progress-bar {
+            width: 90%;
+            max-width: 600px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 20px auto;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 20px;
+            background-color: #219ebc;
+            width: 0;
+            transition: width 2s;
+        }
+
+        /* Ergebnisse */
+        .results-display {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #d9ed92;
+            border: 2px solid #52b788;
+            border-radius: 8px;
+            display: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Wie arbeitet ein Suchbot?</h1>
+    <p>Gib einen Suchbegriff ein, um den Prozess zu starten.</p>
+
+    <!-- Suchleiste -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Suchbegriff eingeben...">
+        <button onclick="startSearch()">Suchen</button>
+    </div>
+
+    <!-- Fortschrittsbalken -->
+    <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- Schritte -->
+    <div class="container">
+        <div class="step" id="query">
+            <div class="label">1. Suchanfrage</div>
+            <div class="description">Du gibst einen Suchbegriff ein.</div>
+        </div>
+
+        <div class="step" id="server">
+            <div class="label">2. Server-Verarbeitung</div>
+            <div class="description">Der Server verarbeitet deine Anfrage.</div>
+        </div>
+
+        <div class="step" id="crawling">
+            <div class="label">3. Web-Crawling</div>
+            <div class="description">Der Bot durchsucht das Internet nach Inhalten.</div>
+        </div>
+
+        <div class="step database" id="indexing">
+            <div class="label">4. Index-Datenbank</div>
+            <div class="description">Gesammelte Daten werden gespeichert und sortiert.</div>
+        </div>
+
+        <div class="step ranking" id="ranking">
+            <div class="label">5. Ranking-Algorithmus</div>
+            <div class="description">Ergebnisse werden nach Relevanz bewertet.</div>
+        </div>
+
+        <div class="step results" id="results">
+            <div class="label">6. Suchergebnisse</div>
+            <div class="description">Du erhältst relevante Treffer.</div>
+        </div>
+    </div>
+
+    <!-- Bot-Animation -->
+    <div class="bot" id="bot">🤖</div>
+
+    <!-- Ergebnisse -->
+    <div class="results-display" id="finalResults">
+        <strong>Suchergebnisse:</strong>
+        <p id="resultContent"></p>
+    </div>
+
+    <script>
+        const bot = document.getElementById("bot");
+        const steps = ["query", "server", "crawling", "indexing", "ranking", "results"];
+        const finalResults = document.getElementById("finalResults");
+        const resultContent = document.getElementById("resultContent");
+        const progress = document.getElementById("progress");
+
+        function startSearch() {
+            const searchInput = document.getElementById("searchInput").value.trim();
+            if (searchInput === "") {
+                alert("Bitte gib einen Suchbegriff ein.");
+                return;
+            }
+
+            bot.style.display = "flex";
+            bot.style.left = "50%";
+            bot.style.top = "100px";
+            bot.innerText = "🔍";
+
+            steps.forEach(id => document.getElementById(id).classList.remove("active"));
+            finalResults.style.display = "none";
+            progress.style.width = "0%";
+
+            processStep(0, searchInput);
+        }
+
+        function processStep(index, searchQuery) {
+            if (index >= steps.length) {
+                displayResults(searchQuery);
+                return;
+            }
+
+            const currentStep = document.getElementById(steps[index]);
+            currentStep.classList.add("active");
+
+            const rect = currentStep.getBoundingClientRect();
+            bot.style.left = rect.left + rect.width / 2 + "px";
+            bot.style.top = rect.top - 60 + window.scrollY + "px";
+
+            const symbols = ["🔍", "📡", "🌐", "📦", "⚡", "✅"];
+            bot.innerText = symbols[index];
+
+            progress.style.width = ((index + 1) / steps.length) * 100 + "%";
+
+            setTimeout(() => processStep(index + 1, searchQuery), 2000);
+        }
+
+        function displayResults(searchQuery) {
+            finalResults.style.display = "block";
+            resultContent.innerText = `Ergebnisse für "${searchQuery}": 
+            \n1. 🔗 Artikel zu ${searchQuery}
+            \n2. 🌍 Webseite über ${searchQuery}
+            \n3. 📄 Neueste News zu ${searchQuery}`;
+        }
+    </script>
+
+</body>
+</html>
